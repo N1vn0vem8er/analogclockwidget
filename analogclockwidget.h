@@ -26,28 +26,48 @@ public:
     void setMinutesHandLengthFactor(double newMinutesHandLengthFactor);
     double getSecondsHandLengthFactor() const;
     void setSecondsHandLengthFactor(double newSecondsHandLengthFactor);
-    bool getDrawSecondsLines() const;
-    void setDrawSecondsLines(bool newDrawSecondsLines);
-    bool getDrawHoursLines() const;
-    void setDrawHoursLines(bool newDrawHoursLines);
+    bool getDrawSecondsIndicators() const;
+    void setDrawSecondsIndicators(bool newDrawSecondsIndicators);
+    bool getDrawHoursIndicators() const;
+    void setDrawHoursIndicators(bool newDrawHoursIndicators);
     bool getDrawHoursNumbers() const;
     void setDrawHoursNumbers(bool newDrawHoursNumbers);
 
+    int getW() const;
+    int getH() const;
+
+    double getClockScale() const;
+    void setClockScale(double newClockScale);
+
+protected:
+    void paintBody(QPainter &painter);
+    void paintHoursHand(QPainter& painter);
+    void paintMinutesHand(QPainter& painter);
+    void paintSecondsHand(QPainter& painter);
+    void paintSecondsIndicators(QPainter& painter);
+    void paintHoursIndicators(QPainter& painter);
+    void paintHoursNumbers(QPainter& painter);
+    void paintCenterPoint(QPainter& painter);
+
 private:
     int w, h;
-    QPen outlinePen;
     QTimer* timer = nullptr;
+    QPen outlinePen;
     QPen hoursHandPen;
     QPen minutesHandPen;
     QPen secondsHandPen;
+    QPen secondsIndicatorsPen;
+    QPen hoursIndicatorsPen;
+    QPen hoursNumbersPen;
     QBrush clockFace;
     int rotation = 11;
     double hoursHandLengthFactor = 0.6;
     double minutesHandLengthFactor = 0.8;
     double secondsHandLengthFactor = 1;
+    double clockScale = 0.6;
 
-    bool drawSecondsLines = true;
-    bool drawHoursLines = true;
+    bool drawSecondsIndicators = true;
+    bool drawHoursIndicators = true;
     bool drawHoursNumbers = false;
 
 private slots:

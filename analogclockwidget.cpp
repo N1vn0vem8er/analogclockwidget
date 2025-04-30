@@ -18,6 +18,9 @@ AnalogClockWidget::AnalogClockWidget(QWidget *parent)
     secondsHandPen = QPen(QColor::fromRgb(134, 134, 134));
     clockFace = QBrush(Qt::white);
     outlinePen = QPen(QColor::fromRgb(255, 255, 255));
+    secondsIndicatorsPen = QPen(Qt::black);
+    hoursIndicatorsPen = QPen(Qt::black, 4);
+    hoursNumbersPen = QPen(Qt::black);
 }
 
 AnalogClockWidget::~AnalogClockWidget()
@@ -105,24 +108,24 @@ void AnalogClockWidget::setSecondsHandLengthFactor(double newSecondsHandLengthFa
     secondsHandLengthFactor = newSecondsHandLengthFactor;
 }
 
-bool AnalogClockWidget::getDrawSecondsLines() const
+bool AnalogClockWidget::getDrawSecondsIndicators() const
 {
-    return drawSecondsLines;
+    return drawSecondsIndicators;
 }
 
-void AnalogClockWidget::setDrawSecondsLines(bool newDrawSecondsLines)
+void AnalogClockWidget::setDrawSecondsIndicators(bool newDrawSecondsIndicators)
 {
-    drawSecondsLines = newDrawSecondsLines;
+    drawSecondsIndicators = newDrawSecondsIndicators;
 }
 
-bool AnalogClockWidget::getDrawHoursLines() const
+bool AnalogClockWidget::getDrawHoursIndicators() const
 {
-    return drawHoursLines;
+    return drawHoursIndicators;
 }
 
-void AnalogClockWidget::setDrawHoursLines(bool newDrawHoursLines)
+void AnalogClockWidget::setDrawHoursIndicators(bool newDrawHoursIndicators)
 {
-    drawHoursLines = newDrawHoursLines;
+    drawHoursIndicators = newDrawHoursIndicators;
 }
 
 bool AnalogClockWidget::getDrawHoursNumbers() const
@@ -135,6 +138,89 @@ void AnalogClockWidget::setDrawHoursNumbers(bool newDrawHoursNumbers)
     drawHoursNumbers = newDrawHoursNumbers;
 }
 
+void AnalogClockWidget::paintBody(QPainter& painter)
+{
+    painter.setBrush(clockFace);
+    painter.setPen(outlinePen);
+    painter.drawEllipse(QRect(width() / 2 - w / 2, height() / 2 - h / 2, w, h));
+}
+
+void AnalogClockWidget::paintHoursHand(QPainter &painter)
+{
+    painter.setPen(hoursHandPen);
+    painter.drawLine(width() / 2, height() / 2, (w*hoursHandLengthFactor)/2 * cos((2*M_PI*QDateTime::currentDateTime().toString("h").toInt())/12 + rotation) + width() / 2,
+                     (h*hoursHandLengthFactor)/2 * sin((2*M_PI*QDateTime::currentDateTime().toString("h").toInt())/12 + rotation) + height() / 2);
+}
+
+void AnalogClockWidget::paintMinutesHand(QPainter& painter)
+{
+    painter.setPen(minutesHandPen);
+    painter.drawLine(width() / 2, height() / 2, (w*minutesHandLengthFactor)/2 * cos((2*M_PI*QDateTime::currentDateTime().toString("mm").toInt())/60 + rotation) + width() / 2,
+                     (h*minutesHandLengthFactor)/2 * sin((2*M_PI*QDateTime::currentDateTime().toString("mm").toInt())/60 + rotation) + height() / 2);
+}
+
+void AnalogClockWidget::paintSecondsHand(QPainter &painter)
+{
+    painter.setPen(secondsHandPen);
+    painter.drawLine(width() / 2, height() / 2, (w*secondsHandLengthFactor)/2 * cos((2*M_PI*QDateTime::currentDateTime().toString("ss").toInt())/60 + rotation) + width() / 2,
+                     (h*secondsHandLengthFactor)/2 * sin((2*M_PI*QDateTime::currentDateTime().toString("ss").toInt())/60 + rotation) + height() / 2);
+}
+
+void AnalogClockWidget::paintSecondsIndicators(QPainter &painter)
+{
+    painter.setPen(secondsIndicatorsPen);
+    for(int i = 0 ; i < 60; i++)
+    {
+        painter.drawLine(w/2 * cos((2*M_PI*i)/60 + rotation) + width() / 2,  h/2 * sin((2*M_PI*i)/60 + rotation) + height() / 2,
+                         (w*0.95)/2 * cos((2*M_PI*i)/60 + rotation) + width() / 2, (h*0.95)/2 * sin((2*M_PI*i)/60 + rotation) + height() / 2);
+    }
+}
+
+void AnalogClockWidget::paintHoursIndicators(QPainter &painter)
+{
+    painter.setPen(hoursIndicatorsPen);
+    for(int i = 0 ; i < 12; i++)
+    {
+        painter.drawLine(w/2 * cos((2*M_PI*i)/12 + rotation) + width() / 2,  h/2 * sin((2*M_PI*i)/12 + rotation) + height() / 2,
+                         (w*0.95)/2 * cos((2*M_PI*i)/12 + rotation) + width() / 2, (h*0.95)/2 * sin((2*M_PI*i)/12 + rotation) + height() / 2);
+    }
+}
+
+void AnalogClockWidget::paintHoursNumbers(QPainter &painter)
+{
+    painter.setPen(hoursNumbersPen);
+    for(int i = 0 ; i < 12; i++)
+    {
+        painter.drawText(QPoint((w-20)/2 * cos((2*M_PI*i)/12 + rotation) + width() / 2,  (h-20)/2 * sin((2*M_PI*i)/12 + rotation) + height() / 2), QString::number(i));
+    }
+}
+
+void AnalogClockWidget::paintCenterPoint(QPainter &painter)
+{
+    painter.setBrush(QBrush(Qt::black));
+    painter.drawEllipse(width() / 2 - 2, height() / 2 - 2, 4, 4);
+}
+
+double AnalogClockWidget::getClockScale() const
+{
+    return clockScale;
+}
+
+void AnalogClockWidget::setClockScale(double newClockScale)
+{
+    clockScale = newClockScale;
+}
+
+int AnalogClockWidget::getW() const
+{
+    return w;
+}
+
+int AnalogClockWidget::getH() const
+{
+    return h;
+}
+
 void AnalogClockWidget::move()
 {
     repaint();
@@ -145,36 +231,14 @@ void AnalogClockWidget::paintEvent(QPaintEvent *event)
     QWidget::paintEvent(event);
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
-    w = (height() < width() ? height() : width())*0.6;
-    h = (height() < width() ? height() : width())*0.6;
-    painter.setBrush(clockFace);
-    painter.setPen(outlinePen);
-    painter.drawEllipse(QRect(width() / 2 - w / 2, height() / 2 - h / 2, w, h));
-    painter.setPen(hoursHandPen);
-    painter.drawLine(width() / 2, height() / 2, (w*hoursHandLengthFactor)/2 * cos((2*M_PI*QDateTime::currentDateTime().toString("h").toInt())/12 + rotation) + width() / 2,
-                     (h*hoursHandLengthFactor)/2 * sin((2*M_PI*QDateTime::currentDateTime().toString("h").toInt())/12 + rotation) + height() / 2);
-    painter.setPen(minutesHandPen);
-    painter.drawLine(width() / 2, height() / 2, (w*minutesHandLengthFactor)/2 * cos((2*M_PI*QDateTime::currentDateTime().toString("mm").toInt())/60 + rotation) + width() / 2,
-                     (h*minutesHandLengthFactor)/2 * sin((2*M_PI*QDateTime::currentDateTime().toString("mm").toInt())/60 + rotation) + height() / 2);
-    painter.setPen(secondsHandPen);
-    painter.drawLine(width() / 2, height() / 2, (w*secondsHandLengthFactor)/2 * cos((2*M_PI*QDateTime::currentDateTime().toString("ss").toInt())/60 + rotation) + width() / 2,
-                     (h*secondsHandLengthFactor)/2 * sin((2*M_PI*QDateTime::currentDateTime().toString("ss").toInt())/60 + rotation) + height() / 2);
-    if(drawSecondsLines) for(int i = 0 ; i < 60; i++)
-        {
-            painter.drawLine(w/2 * cos((2*M_PI*i)/60 + rotation) + width() / 2,  h/2 * sin((2*M_PI*i)/60 + rotation) + height() / 2,
-                             (w*0.95)/2 * cos((2*M_PI*i)/60 + rotation) + width() / 2, (h*0.95)/2 * sin((2*M_PI*i)/60 + rotation) + height() / 2);
-        }
-    if(drawHoursLines) for(int i = 0 ; i < 12; i++)
-        {
-            painter.setPen(QPen(Qt::black, 4));
-            painter.drawLine(w/2 * cos((2*M_PI*i)/12 + rotation) + width() / 2,  h/2 * sin((2*M_PI*i)/12 + rotation) + height() / 2,
-                             (w*0.95)/2 * cos((2*M_PI*i)/12 + rotation) + width() / 2, (h*0.95)/2 * sin((2*M_PI*i)/12 + rotation) + height() / 2);
-        }
-    if(drawHoursNumbers) for(int i = 0 ; i < 12; i++)
-        {
-            painter.setPen(QPen(Qt::black, 4));
-            painter.drawText(QPoint((w-20)/2 * cos((2*M_PI*i)/12 + rotation) + width() / 2,  (h-20)/2 * sin((2*M_PI*i)/12 + rotation) + height() / 2), QString::number(i));
-        }
-    painter.setBrush(QBrush(Qt::black));
-    painter.drawEllipse(width() / 2 - 2, height() / 2 - 2, 4, 4);
+    w = (height() < width() ? height() : width())*clockScale;
+    h = (height() < width() ? height() : width())*clockScale;
+    paintBody(painter);
+    paintHoursHand(painter);
+    paintMinutesHand(painter);
+    paintSecondsHand(painter);
+    if(drawSecondsIndicators) paintSecondsIndicators(painter);
+    if(drawHoursIndicators) paintHoursIndicators(painter);
+    if(drawHoursNumbers) paintHoursNumbers(painter);
+    paintCenterPoint(painter);
 }
