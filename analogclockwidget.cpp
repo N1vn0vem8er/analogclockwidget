@@ -172,7 +172,7 @@ void AnalogClockWidget::paintSecondsIndicators(QPainter &painter)
     for(int i = 0 ; i < 60; i++)
     {
         painter.drawLine(w/2 * cos((2*M_PI*i)/60 + rotation) + width() / 2,  h/2 * sin((2*M_PI*i)/60 + rotation) + height() / 2,
-                         (w*0.95)/2 * cos((2*M_PI*i)/60 + rotation) + width() / 2, (h*0.95)/2 * sin((2*M_PI*i)/60 + rotation) + height() / 2);
+                         (w*secondsIndicatorsScale)/2 * cos((2*M_PI*i)/60 + rotation) + width() / 2, (h*secondsIndicatorsScale)/2 * sin((2*M_PI*i)/60 + rotation) + height() / 2);
     }
 }
 
@@ -182,7 +182,7 @@ void AnalogClockWidget::paintHoursIndicators(QPainter &painter)
     for(int i = 0 ; i < 12; i++)
     {
         painter.drawLine(w/2 * cos((2*M_PI*i)/12 + rotation) + width() / 2,  h/2 * sin((2*M_PI*i)/12 + rotation) + height() / 2,
-                         (w*0.95)/2 * cos((2*M_PI*i)/12 + rotation) + width() / 2, (h*0.95)/2 * sin((2*M_PI*i)/12 + rotation) + height() / 2);
+                         (w*hoursIndicatorsScale)/2 * cos((2*M_PI*i)/12 + rotation) + width() / 2, (h*hoursIndicatorsScale)/2 * sin((2*M_PI*i)/12 + rotation) + height() / 2);
     }
 }
 
@@ -198,7 +198,127 @@ void AnalogClockWidget::paintHoursNumbers(QPainter &painter)
 void AnalogClockWidget::paintCenterPoint(QPainter &painter)
 {
     painter.setBrush(QBrush(Qt::black));
-    painter.drawEllipse(width() / 2 - 2, height() / 2 - 2, 4, 4);
+    painter.drawEllipse(width() / 2 - w*centerPointScale/2, height() / 2 -  w*centerPointScale/2,  w*centerPointScale,  w*centerPointScale);
+}
+
+bool AnalogClockWidget::getDrawHoursHand() const
+{
+    return drawHoursHand;
+}
+
+void AnalogClockWidget::setDrawHoursHand(bool newDrawHoursHand)
+{
+    drawHoursHand = newDrawHoursHand;
+}
+
+bool AnalogClockWidget::getDrawMinutesHand() const
+{
+    return drawMinutesHand;
+}
+
+void AnalogClockWidget::setDrawMinutesHand(bool newDrawMinutesHand)
+{
+    drawMinutesHand = newDrawMinutesHand;
+}
+
+bool AnalogClockWidget::getDrawSecondsHand() const
+{
+    return drawSecondsHand;
+}
+
+void AnalogClockWidget::setDrawSecondsHand(bool newDrawSecondsHand)
+{
+    drawSecondsHand = newDrawSecondsHand;
+}
+
+bool AnalogClockWidget::getDrawBody() const
+{
+    return drawBody;
+}
+
+void AnalogClockWidget::setDrawBody(bool newDrawBody)
+{
+    drawBody = newDrawBody;
+}
+
+bool AnalogClockWidget::getDrawCenterPoint() const
+{
+    return drawCenterPoint;
+}
+
+void AnalogClockWidget::setDrawCenterPoint(bool newDrawCenterPoint)
+{
+    drawCenterPoint = newDrawCenterPoint;
+}
+
+QPen AnalogClockWidget::getOutlinePen() const
+{
+    return outlinePen;
+}
+
+void AnalogClockWidget::setOutlinePen(const QPen &newOutlinePen)
+{
+    outlinePen = newOutlinePen;
+}
+
+QPen AnalogClockWidget::getSecondsIndicatorsPen() const
+{
+    return secondsIndicatorsPen;
+}
+
+void AnalogClockWidget::setSecondsIndicatorsPen(const QPen &newSecondsIndicatorsPen)
+{
+    secondsIndicatorsPen = newSecondsIndicatorsPen;
+}
+
+QPen AnalogClockWidget::getHoursIndicatorsPen() const
+{
+    return hoursIndicatorsPen;
+}
+
+void AnalogClockWidget::setHoursIndicatorsPen(const QPen &newHoursIndicatorsPen)
+{
+    hoursIndicatorsPen = newHoursIndicatorsPen;
+}
+
+QPen AnalogClockWidget::getHoursNumbersPen() const
+{
+    return hoursNumbersPen;
+}
+
+void AnalogClockWidget::setHoursNumbersPen(const QPen &newHoursNumbersPen)
+{
+    hoursNumbersPen = newHoursNumbersPen;
+}
+
+double AnalogClockWidget::getSecondsIndicatorsScale() const
+{
+    return secondsIndicatorsScale;
+}
+
+void AnalogClockWidget::setSecondsIndicatorsScale(double newSecondsIndicatorsScale)
+{
+    secondsIndicatorsScale = newSecondsIndicatorsScale;
+}
+
+double AnalogClockWidget::getHoursIndicatorsScale() const
+{
+    return hoursIndicatorsScale;
+}
+
+void AnalogClockWidget::setHoursIndicatorsScale(double newHoursIndicatorsScale)
+{
+    hoursIndicatorsScale = newHoursIndicatorsScale;
+}
+
+double AnalogClockWidget::getCenterPointScale() const
+{
+    return centerPointScale;
+}
+
+void AnalogClockWidget::setCenterPointScale(double newCenterPointScale)
+{
+    centerPointScale = newCenterPointScale;
 }
 
 double AnalogClockWidget::getClockScale() const
@@ -233,12 +353,12 @@ void AnalogClockWidget::paintEvent(QPaintEvent *event)
     painter.setRenderHint(QPainter::Antialiasing);
     w = (height() < width() ? height() : width())*clockScale;
     h = (height() < width() ? height() : width())*clockScale;
-    paintBody(painter);
-    paintHoursHand(painter);
-    paintMinutesHand(painter);
-    paintSecondsHand(painter);
+    if(drawBody) paintBody(painter);
+    if(drawHoursHand) paintHoursHand(painter);
+    if(drawMinutesHand) paintMinutesHand(painter);
+    if(drawSecondsHand) paintSecondsHand(painter);
     if(drawSecondsIndicators) paintSecondsIndicators(painter);
     if(drawHoursIndicators) paintHoursIndicators(painter);
     if(drawHoursNumbers) paintHoursNumbers(painter);
-    paintCenterPoint(painter);
+    if(drawCenterPoint) paintCenterPoint(painter);
 }
