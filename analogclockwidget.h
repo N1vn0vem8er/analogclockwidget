@@ -60,6 +60,8 @@ public:
     void setDrawBody(bool newDrawBody);
     bool getDrawCenterPoint() const;
     void setDrawCenterPoint(bool newDrawCenterPoint);
+    double getHoursNumbersScale() const;
+    void setHoursNumbersScale(double newHoursNumbersScale);
 
 protected:
     void paintBody(QPainter &painter);
@@ -90,6 +92,7 @@ private:
     double centerPointScale = 0.01;
     double secondsIndicatorsScale = 0.95;
     double hoursIndicatorsScale = 0.95;
+    double hoursNumbersScale = 0.95;
     bool drawSecondsIndicators = true;
     bool drawHoursIndicators = true;
     bool drawHoursNumbers = false;

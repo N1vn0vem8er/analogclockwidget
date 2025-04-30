@@ -191,7 +191,7 @@ void AnalogClockWidget::paintHoursNumbers(QPainter &painter)
     painter.setPen(hoursNumbersPen);
     for(int i = 0 ; i < 12; i++)
     {
-        painter.drawText(QPoint((w-20)/2 * cos((2*M_PI*i)/12 + rotation) + width() / 2,  (h-20)/2 * sin((2*M_PI*i)/12 + rotation) + height() / 2), QString::number(i));
+        painter.drawText(QPoint((w*hoursNumbersScale)/2 * cos((2*M_PI*i)/12 + rotation) + width() / 2,  (h*hoursNumbersScale)/2 * sin((2*M_PI*i)/12 + rotation) + height() / 2), QString::number(i));
     }
 }
 
@@ -199,6 +199,16 @@ void AnalogClockWidget::paintCenterPoint(QPainter &painter)
 {
     painter.setBrush(QBrush(Qt::black));
     painter.drawEllipse(width() / 2 - w*centerPointScale/2, height() / 2 -  w*centerPointScale/2,  w*centerPointScale,  w*centerPointScale);
+}
+
+double AnalogClockWidget::getHoursNumbersScale() const
+{
+    return hoursNumbersScale;
+}
+
+void AnalogClockWidget::setHoursNumbersScale(double newHoursNumbersScale)
+{
+    hoursNumbersScale = newHoursNumbersScale;
 }
 
 bool AnalogClockWidget::getDrawHoursHand() const
